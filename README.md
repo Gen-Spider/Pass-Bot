@@ -1,24 +1,18 @@
-# 🕷️ Pass-Bot - Enterprise Personal Dictionary Generator
+# 🕷️ Pass-Bot — Enterprise Personal Dictionary Generator
 
 <div align="center">
 
-![Pass-Bot Logo](https://img.shields.io/badge/Pass--Bot-v1.0.0-brightgreen?style=for-the-badge&logo=security&logoColor=white)
+![Pass-Bot](https://img.shields.io/badge/Pass--Bot-v1.2.3--Enterprise-brightgreen?style=for-the-badge&logo=python&logoColor=white)
 ![Security](https://img.shields.io/badge/Security-Enterprise-red?style=for-the-badge&logo=shield&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
-![Build](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Stable-success?style=for-the-badge)
 
-**🔐 Professional Personal Brute Force Dictionary Generator**
+**🔐 Gen‑Spider Enterprise Security Systems**
 
-*Enterprise-grade security tool for penetration testing and security analysis*
+Professional, live‑monitored personal dictionary generator with matrix‑style UI, safe interrupt + resume, and strong/full generation modes.
 
-[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Documentation](#-documentation) • [License](#-license)
-
----
-
-![Matrix Style Demo](https://img.shields.io/badge/Status-Active%20Development-green?style=flat-square)
-![Gen-Spider](https://img.shields.io/badge/Gen--Spider-Security%20Systems-red?style=flat-square)
-![Professional](https://img.shields.io/badge/Grade-Professional-blue?style=flat-square)
+[Features](#-enterprise-features) • [Install](#-installation) • [Usage](#-usage) • [UI](#-live-ui--animations) • [Legal](#-legal--responsibility) • [Support](#-enterprise-support)
 
 </div>
 
@@ -26,374 +20,125 @@
 
 ## 🏢 Enterprise Overview
 
-Pass-Bot is an **advanced personal brute force dictionary generator** designed for security professionals, penetration testers, and cybersecurity researchers. Built with enterprise-grade architecture and Gen-Spider level quality standards, it generates intelligent password combinations based on personal information patterns commonly used in real-world scenarios.
-
-### 🎯 Key Capabilities
-
-- **🧠 Intelligent Pattern Recognition**: Advanced algorithms for personal data analysis
-- **🔄 Multi-Input Processing**: Words, mobile numbers, dates, years, symbols, and patterns
-- **⚡ High-Performance Generation**: Optimized for large-scale dictionary creation
-- **🎨 Professional Interface**: Rich console UI with Matrix-style effects
-- **📊 Strength-Based Sorting**: Advanced password strength calculation and prioritization
-- **🛡️ Security-Focused**: Built for professional security testing environments
+Pass‑Bot is an enterprise‑grade personal dictionary generator engineered by **Git‑Spider (Gen‑Spider Security Systems)** for professional red teaming, password auditing, and security research. It builds context‑aware combinations from user‑provided elements with real‑time monitoring, zero‑duplicate guarantees, and safe, resumable execution.
 
 ---
 
-## 🚀 Features
+## 🚀 Enterprise Features
 
-### 📋 Advanced Input Processing
-- **Word Variations**: Multiple case transformations (lower, UPPER, Capitalize, aLtErNaTiNg)
-- **Mobile Fragment Extraction**: Intelligent parsing of mobile numbers (2, 4, 6, 8, 10 digit fragments)
-- **Date Processing**: DOB parsing with multiple format support (DD/MM/YYYY, DD-MM-YYYY, DDMMYYYY)
-- **Year Range Generation**: Automatic expansion of year ranges (2000-2025 → 2000, 2001, ..., 2025)
-- **Pattern Generation**: Common number sequences (123, 321, 1234, etc.)
-- **Symbol Integration**: Custom special character combinations
+- **Live monitoring dashboard**: Rich tables, progress bars, ETA, memory, disk, and generation rate with matrix banner and animations.
+- **Safe Ctrl+C + resume**: Immediate flush to output and persisted checkpoint; resume continues exactly from last phase and position.
+- **Incremental output writing**: Passwords are streamed directly to the output file—no data loss on interruption.
+- **Separator control**: Absolutely no “-” or “.” used; default is no separator, optional “_” on user consent.
+- **Generation modes**:
+  - **Full**: Generate all possible combinations until manually interrupted.
+  - **Strong**: Emit only strong passwords (complexity score ≥ 60) for high‑quality shortlists.
+- **Clean word variations only**: lower, UPPER, Capitalize; no leet number injection (e.g., no ad0min/t6ch).
+- **Inputs supported**: base words, mobile fragments, DOB fragments, year ranges, user‑provided specials, number patterns (00/000/0000).
+- **Zero duplicates**: Deduplicated across all phases, even across resumes; existing output is read to avoid repeats.
 
-### ⚙️ Enterprise Generation Engine
-- **Smart Combinations**: Word + Number + Symbol in multiple arrangements
-- **Strength Calculation**: Entropy-based password strength assessment
-- **Duplicate Prevention**: Automatic deduplication across all combinations
-- **Progressive Sorting**: Strongest passwords first, weakest last
-- **Memory Optimization**: Efficient handling of large datasets
-- **Leet Speak Integration**: Advanced character substitution patterns
+---
 
-### 💼 Professional Features
-- **Enterprise Architecture**: Modular, scalable design with rich console interface
-- **Matrix UI Effects**: Professional console experience with Gen-Spider styling
-- **Comprehensive Statistics**: Detailed generation metrics and performance tracking
-- **Flexible Output**: Configurable limits, custom file naming, and professional formatting
-- **Error Handling**: Robust exception management with user-friendly feedback
-- **Rich Integration**: Advanced terminal UI with progress indicators and tables
+## 🎛️ What’s New in v1.2.3
+
+- Removed “-” and “.” separators across all phases; optional “_”.
+- “Full” vs “Strong” generation modes with real‑time strength scoring.
+- Incremental saving to the same output file during generation.
+- Restored enterprise UI/animations with live statistics and ETA.
+- Robust interrupt handling and exact resume (phase + position).
 
 ---
 
 ## 📦 Installation
 
-### Prerequisites
-- **Python 3.8+** (Required)
-- **pip** package manager
-- **Terminal/Console** access
-
-### Quick Install
 ```bash
-# Clone the repository
+# Clone
 git clone https://github.com/Gen-Spider/Pass-Bot.git
 cd Pass-Bot
 
-# Install dependencies
-pip install -r requirements.txt
+# (Optional) Create venv
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# Make executable (Linux/Mac)
-chmod +x passbot.py
-
-# Run Pass-Bot
+# Run (auto-installs rich, colorama, psutil if missing)
 python passbot.py
 ```
 
-### Dependencies
-Pass-Bot automatically installs required dependencies:
-- `rich>=13.0.0` - Professional terminal UI
-- `colorama>=0.4.6` - Cross-platform colored terminal text
+Pass‑Bot auto‑installs `rich`, `colorama`, and `psutil` on first run if absent.
 
 ---
 
 ## 🎮 Usage
 
-### 🖥️ Interactive Mode (Recommended)
 ```bash
 python passbot.py
 ```
 
-### 📝 Sample Interactive Session
-```
-🕷️ Pass-Bot Enterprise Security Suite Initializing...
+Interactive flow includes:
+- Provide base words.
+- (Optional) Provide mobile numbers, DOB, year range, user symbols, and number patterns (00/000/0000).
+- Choose separator policy (no separator by default, optional “_”).
+- Choose generation mode: `full` or `strong`.
+- Choose output filename.
 
-➤ Enter words: admin, tech, book, movie, john
-➤ Enter mobile numbers: 9876543210, 5551234567
-➤ Enter date of birth: 15/08/1995
-➤ Enter year range: 2000-2025
-➤ Enter special characters: @, $, !, #, %
-➤ Enter pattern types: 000, 0000
-➤ Minimum password count: 5000
-➤ Maximum password count: 100000
-➤ Output filename: enterprise_dictionary.txt
-```
+During generation:
+- UI shows live counters, rate, ETA, memory, disk, current phase, and last password.
+- Output is appended continuously to your chosen file.
+- Press Ctrl+C to safely stop; progress is saved and can be resumed later.
 
-### 📊 Generated Password Examples
-
-**🔥 EXCEPTIONAL Strength (90-100)**
-```
-Admin@1995$Tech
-JOHN#Movie2024!
-Book$987654@
-Tech@1995#Admin
-```
-
-**💪 VERY STRONG (80-89)**
-```
-admin1995@TECH
-Movie$John123
-book#2024
-tech@987654
-```
-
-**✅ STRONG (70-79)**
-```
-johnbook@1995
-tech$movie
-admin123@
-book#admin
-```
-
-**📈 GOOD (60-69)**
-```
-john@admin
-movie1995
-tech$123
-book@
-```
+Resume:
+- On next run, Pass‑Bot detects prior progress and offers to resume exactly where you left off.
 
 ---
 
-## 🏗️ Technical Architecture
+## 🖥 Live UI & Animations
 
-### 🎯 Core Components
-- **`EnterprisePassBot`**: Main orchestration engine with advanced generation algorithms
-- **`PasswordStrengthCalculator`**: Shannon entropy and complexity assessment
-- **`MatrixUI`**: Professional console interface with Rich integration
-- **`InputProfile`**: Structured input data management and validation
-- **`GenerationStats`**: Comprehensive statistics tracking and reporting
-
-### ⚙️ Generation Algorithm Flow
-1. **Input Collection**: Multi-format parsing and validation with error handling
-2. **Variation Creation**: Advanced case transformations and leet speak patterns
-3. **Fragment Extraction**: Intelligent mobile number and date parsing algorithms
-4. **Pattern Generation**: Common sequences and mathematical combinations
-5. **Strength Calculation**: Multi-factor entropy and complexity scoring
-6. **Sorting & Optimization**: Strength-based prioritization with memory optimization
-
-### 🚀 Performance Metrics
-- **Generation Speed**: 50,000+ passwords/second
-- **Memory Efficiency**: <128MB for 1M passwords
-- **Strength Accuracy**: Advanced entropy calculations with 99.97% accuracy
-- **Pattern Recognition**: 20+ combination algorithms with intelligent deduplication
+- Matrix‑style enterprise banner and animated initialization.
+- Rich live layout with two panes: real‑time statistics and progress panel.
+- Accurate percent progress computed from estimated total combinations.
+- Clean, professional color palette with enterprise status messaging.
 
 ---
 
-## 🔒 Security Features
+## 🔧 Generation Details
 
-### 🛡️ Professional Security Standards
-- **Entropy Calculation**: Advanced Shannon entropy measurement
-- **Complexity Assessment**: Multi-factor strength scoring (length, variety, patterns)
-- **Pattern Detection**: Advanced vulnerability identification and scoring
-- **Secure Generation**: Cryptographically secure randomization using `secrets` module
-- **Professional Validation**: Enterprise-grade input validation and sanitization
-
-### 🎯 Professional Use Cases
-- **Penetration Testing**: Professional security assessments and red team operations
-- **Password Auditing**: Organizational security reviews and compliance testing
-- **Security Research**: Cybersecurity research and vulnerability analysis
-- **Educational Training**: Security awareness and professional development
-- **Compliance Testing**: Enterprise security standard validation
+- Words are expanded to: `lower`, `UPPER`, `Capitalize`.
+- Dates are parsed into multiple fragment permutations without adding separators like “-” or “.”.
+- Numbers include mobile fragments and optional patterns (00/000/0000).
+- Separators used in combinations: `""` only by default, and `"_"` if enabled.
+- Strong mode keeps passwords with complexity score ≥ 60; full mode keeps all.
 
 ---
 
-## 📊 Advanced Examples
+## 🧪 Example Scenarios
 
-### 🎪 Enterprise Generation Results
-```bash
-🚀 Pass-Bot Enterprise Generation Complete!
-
-📊 Generation Statistics:
-✅ Total Generated: 487,532 unique passwords
-✅ Processing Time: 12.34 seconds  
-✅ Average Strength: 73.2/100
-✅ Memory Usage: 89.4 MB
-✅ File Size: 15.2 MB
-
-🎯 Strength Distribution:
-EXCEPTIONAL (90-100): 15,234 passwords (3.1%)
-VERY_STRONG (80-89): 45,678 passwords (9.4%)
-STRONG (70-79): 123,456 passwords (25.3%)
-GOOD (60-69): 187,890 passwords (38.6%)
-MODERATE (40-59): 98,765 passwords (20.3%)
-WEAK (20-39): 16,509 passwords (3.4%)
-```
-
-### 🔥 Sample Output Categories
-```
-# EXCEPTIONAL PASSWORDS (Strength: 90+)
-# --------------------------------------------------
-Admin@1995$Tech123
-JOHN#Movie2024!Book
-Tech$987654@Admin
-
-# VERY_STRONG PASSWORDS (Strength: 80-89)
-# --------------------------------------------------
-admin1995@TECH
-Movie$John123
-book#2024tech
-
-# STRONG PASSWORDS (Strength: 70-79)
-# --------------------------------------------------
-johnbook@1995
-tech$movie
-admin123@book
-```
+- Create an exhaustive enterprise list for a target profile using `full` mode with underscore disabled for compact combos.
+- Generate a concise, high‑quality shortlist with `strong` mode to prioritize complex, audit‑ready candidates.
+- Resume a long‑running session after maintenance; Pass‑Bot continues without duplicates and appends to the same file.
 
 ---
 
-## 🧪 Quality Assurance
+## ⚠️ Legal & Responsibility
 
-### 🔍 Testing & Validation
-- **Unit Tests**: Comprehensive component testing with 95%+ coverage
-- **Integration Tests**: End-to-end generation validation
-- **Performance Tests**: Speed and memory benchmarks
-- **Security Tests**: Vulnerability assessments and penetration testing
-- **Compliance Tests**: Enterprise standard validation
+This project is provided by **Git‑Spider (Gen‑Spider Security Systems)** strictly for **educational** and **authorized security testing** purposes. You are solely responsible for how you use it. The author and organization **will not be responsible** for any misuse, unlawful activity, damage, or policy violations resulting from the use of this software. Always obtain explicit written permission before testing systems you do not own or operate.
 
-### 📈 Benchmarks
-```
-Performance Metrics (Tested on Intel i7-10700K):
-- Generation Speed: 52,347 passwords/second
-- Memory Usage: <128MB for 1M passwords  
-- CPU Efficiency: 89% optimization score
-- Accuracy Rate: 99.97% unique combinations
-- Error Rate: <0.01% generation failures
-```
-
----
-
-## 🤝 Contributing
-
-### 🔧 Development Setup
-```bash
-# Fork and clone
-git clone https://github.com/Gen-Spider/Pass-Bot.git
-cd Pass-Bot
-
-# Development environment
-pip install -r requirements-dev.txt
-
-# Run tests
-python -m pytest tests/ -v
-
-# Code quality
-flake8 passbot.py
-black --check passbot.py
-mypy passbot.py
-```
-
-### 📋 Contribution Guidelines
-1. **Fork** the repository
-2. **Create** feature branch (`git checkout -b feature/awesome-enhancement`)
-3. **Commit** changes (`git commit -am 'Add awesome feature'`)
-4. **Push** to branch (`git push origin feature/awesome-enhancement`)
-5. **Create** Pull Request with detailed description
-
----
-
-## 📚 Documentation
-
-### 📖 Additional Resources
-- **[API Documentation](docs/api.md)**: Complete API reference and examples
-- **[Integration Guide](docs/integration.md)**: Enterprise integration patterns
-- **[Security Guidelines](docs/security.md)**: Professional security best practices
-- **[Performance Guide](docs/performance.md)**: Optimization and tuning
-- **[Troubleshooting](docs/troubleshooting.md)**: Common issues and solutions
-
-### 🎓 Professional Training
-- **Video Tutorials**: Step-by-step professional guides
-- **Case Studies**: Real-world enterprise implementations
-- **Best Practices**: Professional security recommendations
-- **Certification**: Professional security tool certification
-
----
-
-## ⚠️ Legal & Compliance
-
-**IMPORTANT SECURITY NOTICE**
-
-Pass-Bot is designed exclusively for **authorized security testing** by qualified security professionals. Users must ensure compliance with all applicable laws, regulations, and organizational policies.
-
-### 🚫 Prohibited Uses
-- Unauthorized testing against systems you do not own
-- Violation of computer fraud and abuse laws
-- Bypassing security controls without explicit authorization
-- Any malicious or illegal activities
-
-### ✅ Authorized Uses
-- Professional penetration testing with proper authorization
-- Security research in controlled environments
-- Educational purposes in academic settings
-- Organizational security assessments with management approval
+- Unauthorized access or testing is illegal in many jurisdictions.
+- Use in controlled, consented environments only.
+- Comply with all applicable laws, regulations, and organizational policies.
 
 ---
 
 ## 📄 License
 
-```
-MIT License
-
-Copyright (c) 2025 Gen-Spider Security Systems
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPlIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
+MIT License © 2025 Gen‑Spider Security Systems. See `LICENSE` for details.
 
 ---
 
-## 🌟 Recognition & Awards
+## 🛠 Enterprise Support
 
-- 🏆 **Enterprise Security Tool of the Year 2025**
-- 🥇 **Best Innovation in Penetration Testing Tools**  
-- 🎖️ **Professional Security Research Excellence**
-- 🏅 **Advanced Cybersecurity Tool Recognition**
+For enterprise engagements, training, or support, contact Gen‑Spider:
 
----
+- Email: security@gen-spider.com
+- LinkedIn: Gen‑Spider Security Systems
+- Community: Gen‑Spider Security (Discord)
 
-## 📞 Professional Support
-
-### 🛠️ Enterprise Support
-- **Professional Consulting**: Security implementation guidance
-- **Custom Development**: Enterprise feature development
-- **Training Services**: Professional security tool training
-- **24/7 Support**: Enterprise-grade technical support
-
-### 📧 Contact Information
-- **Email**: security@gen-spider.com
-- **Discord**: [Gen-Spider Security Community](https://discord.gg/gen-spider)
-- **LinkedIn**: [Gen-Spider Security Systems](https://linkedin.com/company/gen-spider)
-- **Twitter**: [@GenSpiderSec](https://twitter.com/GenSpiderSec)
-
----
-
-<div align="center">
-
-**🕷️ Gen-Spider Security Systems | Professional Security Solutions 🕷️**
-
-![Security](https://img.shields.io/badge/Security-Enterprise-red?style=flat-square)
-![Quality](https://img.shields.io/badge/Quality-Professional-green?style=flat-square)
-![Support](https://img.shields.io/badge/Support-24/7-blue?style=flat-square)
-![Innovation](https://img.shields.io/badge/Innovation-Cutting%20Edge-purple?style=flat-square)
-
-*Advancing cybersecurity through professional-grade tools and research*
-
-**⭐ If Pass-Bot helps your security testing, please star this repository! ⭐**
-
-</div>
-
----
-
-*Last Updated: October 16, 2025 | Version 1.0.0 Enterprise*
+If Pass‑Bot assists your assessments, consider starring the repo to support continued enterprise tooling.
