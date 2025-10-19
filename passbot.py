@@ -144,7 +144,7 @@ class MatrixUI:
     def clear(self):
         os.system("cls" if os.name == "nt" else "clear")
 
-    def show_matrix_effect(self, duration: float = 1.2):
+    def show_matrix_effect(self, duration: float = 1.8):
         chars = string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|;:,.<>?"
         start = time.time()
         print("\033[?25l", end="")  # hide cursor
@@ -154,11 +154,47 @@ class MatrixUI:
                 row = secrets.randbelow(max(4, self.height - 4))
                 ch = secrets.choice(chars)
                 print(f"\033[{row};{col}H\033[92m{ch}\033[0m", end="", flush=True)
-                time.sleep(0.004)
+                time.sleep(0.006)
         finally:
             print("\033[H\033[J\033[?25h", end="")  # clear + show cursor
 
+    def show_full_banner(self):
+        """Full ASCII art banner with correct PASSBOT branding"""
+        if RICH_AVAILABLE:
+            self.clear()
+            self.show_matrix_effect(1.8)
+            banner_text = Text(
+                "\n██████╗  █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗\n"
+                "██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝\n"
+                "██████╔╝███████║███████╗███████╗██████╔╝██║   ██║   ██║   \n"
+                "██╔═══╝ ██╔══██║╚════██║╚════██║██╔══██╗██║   ██║   ██║   \n"
+                "██║     ██║  ██║███████║███████║██████╔╝╚██████╔╝   ██║   \n"
+                "╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝    ╚═╝   \n\n"
+                "🕷️ ENTERPRISE SUITE — Professional Password Dictionary Generation 🕷️\n",
+                style="bold green"
+            )
+            panel = Panel(
+                Align.center(banner_text),
+                title="[bold red]🔐 GEN-SPIDER SECURITY SYSTEMS 🔐[/bold red]",
+                border_style="red",
+                padding=(1, 2)
+            )
+            self.console.print(panel)
+        else:
+            self.clear()
+            print(f"{BOLD}{GREEN}")
+            print("██████╗  █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗")
+            print("██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝")
+            print("██████╔╝███████║███████╗███████╗██████╔╝██║   ██║   ██║   ")
+            print("██╔═══╝ ██╔══██║╚════██║╚════██║██╔══██╗██║   ██║   ██║   ")
+            print("██║     ██║  ██║███████║███████║██████╔╝╚██████╔╝   ██║   ")
+            print("╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝    ╚═╝   ")
+            print("")
+            print("🕷️ ENTERPRISE SUITE — Professional Password Dictionary Generation 🕷️")
+            print(f"🔐 GEN-SPIDER SECURITY SYSTEMS v{APP_VERSION} 🔐{RESET}")
+
     def show_banner(self):
+        """Simplified banner for quick display"""
         if RICH_AVAILABLE:
             self.clear()
             self.show_matrix_effect(1.0)
@@ -741,8 +777,10 @@ class PassBotEnterprise:
         self.output_handle = gzip.open(fname, 'ab', compresslevel=6) if fname.endswith('.gz') else open(fname, 'ab', buffering=1024*1024)
 
     def run(self) -> int:
-        # Brand intro
-        self.ui.show_banner()
+        # Full Brand intro with ASCII art
+        self.ui.show_full_banner()
+        time.sleep(2.0)  # Let user see the banner
+        
         # Resume or fresh
         resumed = False
         if os.path.exists(self.progress_file):
