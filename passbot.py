@@ -219,21 +219,32 @@ class PasswordStrength:
         return PasswordStrength.calculate_score(password) >= threshold
 
 class MatrixUI:
-    """Enterprise-grade UI with matrix styling and live updates"""
+    """Enterprise-grade UI with Gen-Spider brand styling"""
     
     def __init__(self):
         self.console = Console() if RICH_AVAILABLE else None
         
     def show_banner(self):
-        """Display enterprise banner with matrix styling"""
+        """Display Gen-Spider branded banner"""
         if RICH_AVAILABLE:
-            banner_art = """
-[bright_green]╔══════════════════════════════════════════════════════════════════════════════╗
-║         🕷️  PASSBOT ENTERPRISE - COMPLETE 9-CHAPTER LOGIC  🕷️               ║
-║                    🎯 Gen-Spider Security Systems 🎯                        ║
-║               Professional Password Dictionary Generator                      ║
-╚══════════════════════════════════════════════════════════════════════════════╝[/bright_green]
-
+            # Gen-Spider brand style banner text
+            banner_text = Text(
+                "PASSBOT ENTERPRISE SUITE v2.0\n"
+                "Professional Password Generation & Analysis System\n"
+                "Complete 9-Chapter Logic Implementation",
+                style="bold green"
+            )
+            
+            panel = Panel(
+                Align.center(banner_text),
+                title="[bold red]🔐 GEN-SPIDER SECURITY SYSTEMS 🔐[/bold red]",
+                border_style="red",
+                padding=(1, 2)
+            )
+            self.console.print(panel)
+            
+            # Chapter implementation list
+            chapters_text = """
 [cyan]📋 Implemented Chapters:[/cyan]
 [yellow]1. Words Input Logic[/yellow] - Multi-case variations (lower, UPPER, Capitalize)
 [yellow]2. Mobile Numbers Logic[/yellow] - Smart fragment extraction (2-10 digits)
@@ -245,20 +256,14 @@ class MatrixUI:
 [yellow]8. Generation Mode Logic[/yellow] - Full vs Strong filtering
 [yellow]9. Resume Logic[/yellow] - Exact checkpoint recovery
 """
-            panel = Panel(
-                Align.center(Text(banner_art, style="bright_green")),
-                title="[bold red]🔐 PASSBOT ENTERPRISE v2.0[/bold red]",
-                border_style="red",
-                box=box.DOUBLE
-            )
-            self.console.print(panel)
+            self.console.print(chapters_text)
         else:
             print(f"{Colors.BRIGHT}{Colors.GREEN}")
-            print("╔══════════════════════════════════════════════════════════════════════════════╗")
-            print("║         🕷️  PASSBOT ENTERPRISE - COMPLETE 9-CHAPTER LOGIC  🕷️               ║")
-            print("║                    🎯 Gen-Spider Security Systems 🎯                        ║")
-            print("║               Professional Password Dictionary Generator                      ║")
-            print("╚══════════════════════════════════════════════════════════════════════════════╝")
+            print("╔" + "="*70 + "╗")
+            print("║" + " "*10 + "🔐 GEN-SPIDER SECURITY SYSTEMS 🔐" + " "*10 + "║")
+            print("║" + " "*5 + "PASSBOT ENTERPRISE SUITE v2.0" + " "*19 + "║")
+            print("║" + " "*2 + "Professional Password Generation & Analysis" + " "*5 + "║")
+            print("╚" + "="*70 + "╝")
             print(f"{Colors.RESET}")
     
     def show_loading(self, message: str, duration: float = 2.0):
@@ -382,19 +387,24 @@ class PassBotEnterprise:
         signal.signal(signal.SIGINT, self._handle_interrupt)
     
     def _handle_interrupt(self, signum, frame):
-        """Chapter 9: Safe interrupt handling"""
-        print(f"\n{Colors.YELLOW}[🛑] Interrupt received - Safely stopping and saving progress...{Colors.RESET}")
+        """Chapter 9: Optimized safe interrupt handling"""
+        print(f"\n{Colors.YELLOW}[🛑] Interrupt received - Safely stopping...{Colors.RESET}")
         self.interrupted = True
         
-        # Flush output file immediately
-        if self.output_file and not self.output_file.closed:
-            try:
+        # Immediate actions to speed up shutdown
+        try:
+            # Single flush and fsync
+            if self.output_file and not self.output_file.closed:
                 self.output_file.flush()
                 os.fsync(self.output_file.fileno())
-            except Exception:
-                pass
+        except Exception:
+            pass
         
-        self._save_progress()
+        # Quick save without heavy processing
+        try:
+            self._save_progress()
+        except Exception:
+            pass
     
     def _get_system_stats(self) -> Tuple[float, float]:
         """Get current memory usage and disk space"""
@@ -711,12 +721,11 @@ class PassBotEnterprise:
             except Exception:
                 pass
         
-        # Periodic flush and save
-        if len(self.generated_passwords) % 1000 == 0:
+        # Optimized periodic flush - reduced frequency during normal operation
+        if len(self.generated_passwords) % 2000 == 0:
             try:
-                if self.output_file:
+                if self.output_file and not self.interrupted:
                     self.output_file.flush()
-                    os.fsync(self.output_file.fileno())
             except Exception:
                 pass
         
@@ -792,7 +801,7 @@ class PassBotEnterprise:
         return total
     
     def _generate_passwords(self, layout):
-        """Main password generation logic implementing all phases"""
+        """Main password generation logic implementing all phases with fast interrupt checks"""
         if not self.input_profile:
             return
         
@@ -819,7 +828,7 @@ class PassBotEnterprise:
         if self.current_phase == 1:
             phase_desc = "Phase 1/7: Single Words"
             for i, word in enumerate(words):
-                if self.interrupted:
+                if self.interrupted:  # Fast interrupt check
                     return
                 if i < self.phase_position:
                     continue
@@ -839,7 +848,7 @@ class PassBotEnterprise:
         if self.current_phase == 2:
             phase_desc = "Phase 2/7: Single Numbers"
             for i, number in enumerate(numbers):
-                if self.interrupted:
+                if self.interrupted:  # Fast interrupt check
                     return
                 if i < self.phase_position:
                     continue
@@ -861,14 +870,18 @@ class PassBotEnterprise:
             combination_index = 0
             
             for word in words:
-                if self.interrupted:
+                if self.interrupted:  # Fast interrupt check
                     return
                 for number in numbers:
+                    if self.interrupted:  # Fast interrupt check in inner loop
+                        return
                     for separator in separators:
                         # Both orders: word+number and number+word
                         combinations = [f"{word}{separator}{number}", f"{number}{separator}{word}"]
                         
                         for combo in combinations:
+                            if self.interrupted:  # Fast interrupt check in deepest loop
+                                return
                             if combination_index < self.phase_position:
                                 combination_index += 1
                                 continue
@@ -891,13 +904,17 @@ class PassBotEnterprise:
             combination_index = 0
             
             for word in words:
-                if self.interrupted:
+                if self.interrupted:  # Fast interrupt check
                     return
                 for special in specials:
+                    if self.interrupted:  # Fast interrupt check in inner loop
+                        return
                     for separator in separators:
                         combinations = [f"{word}{separator}{special}", f"{special}{separator}{word}"]
                         
                         for combo in combinations:
+                            if self.interrupted:  # Fast interrupt check in deepest loop
+                                return
                             if combination_index < self.phase_position:
                                 combination_index += 1
                                 continue
@@ -923,13 +940,17 @@ class PassBotEnterprise:
             combination_index = 0
             
             for number in numbers:
-                if self.interrupted:
+                if self.interrupted:  # Fast interrupt check
                     return
                 for special in specials:
+                    if self.interrupted:  # Fast interrupt check in inner loop
+                        return
                     for separator in separators:
                         combinations = [f"{number}{separator}{special}", f"{special}{separator}{number}"]
                         
                         for combo in combinations:
+                            if self.interrupted:  # Fast interrupt check in deepest loop
+                                return
                             if combination_index < self.phase_position:
                                 combination_index += 1
                                 continue
@@ -955,14 +976,18 @@ class PassBotEnterprise:
             combination_index = 0
             
             for i, word1 in enumerate(words):
-                if self.interrupted:
+                if self.interrupted:  # Fast interrupt check
                     return
                 for j, word2 in enumerate(words):
+                    if self.interrupted:  # Fast interrupt check in inner loop
+                        return
                     if i == j:  # Skip same word
                         continue
                     for separator in separators:
                         combo = f"{word1}{separator}{word2}"
                         
+                        if self.interrupted:  # Fast interrupt check in deepest loop
+                            return
                         if combination_index < self.phase_position:
                             combination_index += 1
                             continue
@@ -990,11 +1015,17 @@ class PassBotEnterprise:
             # Word + Number + Special
             if words and numbers and specials:
                 for word in words:
-                    if self.interrupted:
+                    if self.interrupted:  # Fast interrupt check
                         return
                     for number in numbers:
+                        if self.interrupted:  # Fast interrupt check
+                            return
                         for special in specials:
+                            if self.interrupted:  # Fast interrupt check
+                                return
                             for sep1 in separators:
+                                if self.interrupted:  # Fast interrupt check
+                                    return
                                 for sep2 in separators:
                                     # Multiple permutations
                                     combinations = [
@@ -1007,6 +1038,8 @@ class PassBotEnterprise:
                                     ]
                                     
                                     for combo in combinations:
+                                        if self.interrupted:  # Fast interrupt check in deepest loop
+                                            return
                                         if combination_index < self.phase_position:
                                             combination_index += 1
                                             continue
@@ -1023,13 +1056,19 @@ class PassBotEnterprise:
             # Word + Word + Number
             if len(words) >= 2 and numbers:
                 for i, word1 in enumerate(words):
-                    if self.interrupted:
+                    if self.interrupted:  # Fast interrupt check
                         return
                     for j, word2 in enumerate(words):
+                        if self.interrupted:  # Fast interrupt check
+                            return
                         if i == j:
                             continue
                         for number in numbers:
+                            if self.interrupted:  # Fast interrupt check
+                                return
                             for sep1 in separators:
+                                if self.interrupted:  # Fast interrupt check
+                                    return
                                 for sep2 in separators:
                                     combinations = [
                                         f"{word1}{sep1}{word2}{sep2}{number}",
@@ -1038,6 +1077,8 @@ class PassBotEnterprise:
                                     ]
                                     
                                     for combo in combinations:
+                                        if self.interrupted:  # Fast interrupt check in deepest loop
+                                            return
                                         if combination_index < self.phase_position:
                                             combination_index += 1
                                             continue
@@ -1133,7 +1174,8 @@ class PassBotEnterprise:
                     except Exception:
                         pass
                 
-                self._save_progress()
+                if not self.interrupted:
+                    self._save_progress()
             
             # Final summary
             total_generated = len(self.generated_passwords)
