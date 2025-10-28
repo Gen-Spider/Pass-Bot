@@ -39,8 +39,8 @@ class TestPassBotResumeBug(unittest.TestCase):
         if os.path.exists(self.progress_filename):
             os.remove(self.progress_filename)
 
-    @patch('passbot.MatrixUI.show_full_banner')
-    @patch('builtins.input', MagicMock(side_effect=['test', '', '', '', '', 'n', '', 'test_dictionary.txt', 'full', 'n', 'n', 'n']))
+    @patch('passbot.HorrorUI.show_full_banner')
+    @patch('builtins.input', MagicMock(side_effect=['test', '', '', '', '', 'n', '', 'test_dictionary.txt', 'full', 'none', 'n', 'n', '0', '0', 'n']))
     def test_resume_with_missing_output_file_triggers_fresh_start(self, mock_show_banner):
         """
         Verify that resuming with a progress file but no output file
@@ -58,7 +58,7 @@ class TestPassBotResumeBug(unittest.TestCase):
             generation_mode="full",
             use_underscore_separator=False,
             max_output_count=None,
-            gzip_output=False,
+            compression="none",
             shard_every_million=False,
             strong_threshold=60.0,
         )
