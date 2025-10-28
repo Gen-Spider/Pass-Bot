@@ -38,11 +38,12 @@ try:
     from rich.prompt import Prompt, Confirm, IntPrompt
     from rich.align import Align
     from rich.live import Live
-    from rich.layout import Layout
+    from rich import layout as rich_layout # Import the module as an alias
     from rich import box
     RICH_AVAILABLE = True
 except Exception:
     RICH_AVAILABLE = False
+    rich_layout = None # Define it as None on failure
 
 # --- CINEMATIC STYLE PALETTE ---
 # (ANSI fallbacks for non-rich environments)
@@ -172,7 +173,7 @@ class MatrixUI:
                 row = secrets.randbelow(max(4, self.height - 4))
                 ch = secrets.choice(chars)
                 # Use styled print
-                self.console.print(f"\033[{row};{col}H[{STYLE_GREEN}]{ch}[/{STYLE_GREEN}]", end="", flush=True)
+                self.console.print(f"\033[{row};{col}H[{STYLE_GREEN}]{ch}[/{STYLE_GREEN}]", end="")
                 time.sleep(0.006)
         finally:
             self.console.print("\033[H\033[J\033[?25h", end="")  # clear + show cursor
@@ -238,20 +239,24 @@ class MatrixUI:
         """Defines the main Rich layout, adjusted for cinematic feel"""
         if not RICH_AVAILABLE:
             return None
-        lay = Layout()
+        
+        # Import Layout here to avoid potential global scope issues in exec environments
+        # from rich.layout import Layout # <-- REMOVE THIS LINE
+        
+        lay = rich_layout.Layout() # Use the aliased module
         lay.split(
-            Layout(name="header", size=3),
-            Layout(name="main", ratio=1),
-            Layout(name="footer", size=3)
+            rich_layout.Layout(name="header", size=3), # Use the aliased module
+            rich_layout.Layout(name="main", ratio=1), # Use the aliased module
+            rich_layout.Layout(name="footer", size=3) # Use the aliased module
         )
         # Split main stage 70% (progress) and live stats 30% (table)
         lay["main"].split_row(
-            Layout(name="main_stage", ratio=70),
-            Layout(name="live_stats", ratio=30)
+            rich_layout.Layout(name="main_stage", ratio=70), # Use the aliased module
+            rich_layout.Layout(name="live_stats", ratio=30) # Use the aliased module
         )
         return lay
 
-    def update_live(self, layout: Layout, stats: LiveStats):
+    def update_live(self, layout: rich_layout.Layout, stats: LiveStats): # Update type hint
         """Updates the live layout with new stats and cinematic styling"""
         if not (RICH_AVAILABLE and layout):
             return
@@ -979,3 +984,6 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+
