@@ -12,7 +12,7 @@ PassBot Enterprise — Gen‑Spider Brand Edition (Optimized)
 - Visual polish and stable matrix intro
 - Optional multi-file sharding for huge outputs
 """
-import os, sys, re, time, math, signal, pickle, shutil, secrets, string, gzip, hashlib
+import os, sys, re, time, math, signal, pickle, shutil, secrets, string, gzip, hashlib, bz2, lzma, random
 from dataclasses import dataclass, asdict
 from typing import List, Set, Optional, Dict, Tuple, Iterable
 from collections import defaultdict
@@ -81,9 +81,12 @@ class InputProfile:
     generation_mode: str = "full"  # full or strong
     use_underscore_separator: bool = False
     max_output_count: Optional[int] = None
-    gzip_output: bool = False
+    compression: str = "none"
     shard_every_million: bool = False
     strong_threshold: float = 60.0
+    min_length: int = 0
+    max_length: int = 0
+    leetspeak: bool = False
 
 class PasswordStrength:
     @staticmethod
@@ -130,7 +133,7 @@ class PasswordStrength:
     def is_strong(pw: str, threshold: float) -> bool:
         return PasswordStrength.score(pw) >= threshold
 
-class MatrixUI:
+class HorrorUI:
     def __init__(self):
         self.console = Console() if RICH_AVAILABLE else None
         if RICH_AVAILABLE:
@@ -144,74 +147,86 @@ class MatrixUI:
     def clear(self):
         os.system("cls" if os.name == "nt" else "clear")
 
-    def show_matrix_effect(self, duration: float = 1.8):
-        chars = string.ascii_letters + string.digits + "!@#$%^&*()_+-=[]{}|;:,.<>?"
+    def show_matrix_effect(self, duration: float = 2.5):
+        chars = "01" + "!@#$%^&*()_+-=[]{}|;:,.<>?"
+        glitch_chars = ["▓", "▒", "░"]
         start = time.time()
         print("\033[?25l", end="")  # hide cursor
         try:
             while time.time() - start < duration:
-                col = secrets.randbelow(max(2, self.width - 2))
-                row = secrets.randbelow(max(4, self.height - 4))
-                ch = secrets.choice(chars)
-                print(f"\033[{row};{col}H\033[92m{ch}\033[0m", end="", flush=True)
-                time.sleep(0.006)
+                for _ in range(int(self.width / 2)):
+                    col = secrets.randbelow(self.width) if self.width > 0 else 0
+                    row = secrets.randbelow(self.height) if self.height > 0 else 0
+                    ch = secrets.choice(chars)
+                    color = secrets.choice([91, 92, 93, 94, 95, 96]) # red, green, yellow, blue, magenta, cyan
+                    print(f"\033[{row};{col}H\033[{color}m{ch}\033[0m", end="", flush=True)
+
+                if secrets.randbelow(10) < 2:
+                    col = secrets.randbelow(self.width - 5) if self.width > 5 else 0
+                    row = secrets.randbelow(self.height) if self.height > 0 else 0
+                    print(f"\033[{row};{col}H\033[91m{''.join(secrets.choice(glitch_chars) for _ in range(5))}\033[0m", end="", flush=True)
+
+                time.sleep(0.01)
         finally:
-            print("\033[H\033[J\033[?25h", end="")  # clear + show cursor
+            print("\033[H\033[J\033[?25h", end="")
 
     def show_full_banner(self):
-        """Full ASCII art banner with correct PASSBOT branding"""
         if RICH_AVAILABLE:
             self.clear()
-            self.show_matrix_effect(1.8)
+            self.show_matrix_effect(2.5)
             banner_text = Text(
-                "\n██████╗  █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗\n"
-                "██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝\n"
-                "██████╔╝███████║███████╗███████╗██████╔╝██║   ██║   ██║   \n"
-                "██╔═══╝ ██╔══██║╚════██║╚════██║██╔══██╗██║   ██║   ██║   \n"
-                "██║     ██║  ██║███████║███████║██████╔╝╚██████╔╝   ██║   \n"
-                "╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝    ╚═╝   \n\n"
-                "🕷️ ENTERPRISE SUITE — Professional Password Dictionary Generation 🕷️\n",
-                style="bold green"
+                "\n"
+                "        ▒▓▓▓▒▒▒░░▒▒▒▒▒▒▒░░▒▒▓▓▓▒░\n"
+                "      ▒▓    ▒▓▓▓▒░    ░▒▓▓▓▒    ▓▒\n"
+                "    ▒▓        ▒▓▓▓▒░▒▓▓▓▒        ▓▒\n"
+                "  ▒▓          ▒▓▓▓▓▓▓▓▓▒          ▓▒\n"
+                "▒▓            ▒▓▓▓▓▓▓▓▓▒            ▓▒\n"
+                "▓▒            ▒▓  ▓▓▓  ▓▒            ▒▓\n"
+                "▓▒            ▓▒  ▒▓▒  ▒▓            ▒▓\n"
+                "▓▒          ▒▓    ▓ ▒▓    ▓▒          ▒▓\n"
+                "▓▒        ▒▓    ▒▓ ▒ ▓▒    ▓▒        ▒▓\n"
+                "▓▒      ▒▓    ▒▓▒ ▓ ▒▓▒    ▓▒      ▒▓\n"
+                "▓▒    ▒▓    ▒▓▒   ▓   ▒▓▒    ▓▒    ▒▓\n"
+                "▓▒  ▒▓    ▒▓▒     ▓     ▒▓▒    ▓▒  ▒▓\n"
+                "▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▓\n"
+                "▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓\n"
+                "▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓\n"
+                "▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓\n"
+                "▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓\n"
+                "▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓\n"
+                "▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▓\n",
+                style="bold red"
             )
             panel = Panel(
                 Align.center(banner_text),
-                title="[bold red]🔐 GEN-SPIDER SECURITY SYSTEMS 🔐[/bold red]",
+                title="[bold red]💀 DANGER: PASSBOT ACTIVE 💀[/bold red]",
                 border_style="red",
                 padding=(1, 2)
             )
             self.console.print(panel)
         else:
             self.clear()
-            print(f"{BOLD}{GREEN}")
-            print("██████╗  █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗")
-            print("██╔══██╗██╔══██╗██╔════╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝")
-            print("██████╔╝███████║███████╗███████╗██████╔╝██║   ██║   ██║   ")
-            print("██╔═══╝ ██╔══██║╚════██║╚════██║██╔══██╗██║   ██║   ██║   ")
-            print("██║     ██║  ██║███████║███████║██████╔╝╚██████╔╝   ██║   ")
-            print("╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═════╝  ╚═════╝    ╚═╝   ")
-            print("")
-            print("🕷️ ENTERPRISE SUITE — Professional Password Dictionary Generation 🕷️")
-            print(f"🔐 GEN-SPIDER SECURITY SYSTEMS v{APP_VERSION} 🔐{RESET}")
-
-    def show_banner(self):
-        """Simplified banner for quick display"""
-        if RICH_AVAILABLE:
-            self.clear()
-            self.show_matrix_effect(1.0)
-            banner_text = Text(
-                "\n🕷️ PASSBOT ENTERPRISE SUITE — v" + APP_VERSION + "\n"
-                "Professional Password Dictionary Generation & Analysis\n",
-                style="bold green"
-            )
-            panel = Panel(
-                Align.center(banner_text),
-                title="[bold red]🔐 GEN-SPIDER SECURITY SYSTEMS 🔐[/bold red]",
-                border_style="red",
-                padding=(1, 2)
-            )
-            self.console.print(panel)
-        else:
-            print(f"{BOLD}{GREEN}PASSBOT ENTERPRISE — GEN‑SPIDER SECURITY SYSTEMS v{APP_VERSION}{RESET}")
+            print(f"{BOLD}{RED}")
+            print("        ▒▓▓▓▒▒▒░░▒▒▒▒▒▒▒░░▒▒▓▓▓▒░")
+            print("      ▒▓    ▒▓▓▓▒░    ░▒▓▓▓▒    ▓▒")
+            print("    ▒▓        ▒▓▓▓▒░▒▓▓▓▒        ▓▒")
+            print("  ▒▓          ▒▓▓▓▓▓▓▓▓▒          ▓▒")
+            print("▒▓            ▒▓▓▓▓▓▓▓▓▒            ▓▒")
+            print("▓▒            ▒▓  ▓▓▓  ▓▒            ▒▓")
+            print("▓▒            ▓▒  ▒▓▒  ▒▓            ▒▓")
+            print("▓▒          ▒▓    ▓ ▒▓    ▓▒          ▒▓")
+            print("▓▒        ▒▓    ▒▓ ▒ ▓▒    ▓▒        ▒▓")
+            print("▓▒      ▒▓    ▒▓▒ ▓ ▒▓▒    ▓▒      ▒▓")
+            print("▓▒    ▒▓    ▒▓▒   ▓   ▒▓▒    ▓▒    ▒▓")
+            print("▓▒  ▒▓    ▒▓▒     ▓     ▒▓▒    ▓▒  ▒▓")
+            print("▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▓")
+            print("▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓")
+            print("▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓")
+            print("▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓")
+            print("▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓")
+            print("▓▒▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▓▓▒ ▒▓▒▓")
+            print("▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▓")
+            print(f"💀 DANGER: PASSBOT ACTIVE v{APP_VERSION} 💀{RESET}")
 
     def layout(self):
         if not RICH_AVAILABLE:
@@ -221,28 +236,41 @@ class MatrixUI:
         lay["main"].split_row(Layout(name="stats", ratio=2), Layout(name="progress", ratio=3))
         return lay
 
-    def update_live(self, layout: Layout, stats: LiveStats):
+    def update_live(self, layout: 'Layout', stats: LiveStats):
         if not (RICH_AVAILABLE and layout):
             return
         now = datetime.now().strftime("%H:%M:%S")
-        layout["header"].update(Panel(f"[bold green]🎯 LIVE GENERATION — {now}[/bold green]", border_style="green"))
 
-        tbl = Table(show_header=False, box=box.SIMPLE)
-        tbl.add_column("Metric", style="cyan", width=15)
-        tbl.add_column("Value", style="bright_green")
+        # Glitchy header
+        header_text = f"[bold red]TARGETING... BREACHING... {now}[/bold red]"
+        if secrets.randbelow(10) < 2:
+            header_text = f"[bold red]T4RG3TING... BR34CHING... {now}[/bold red]"
+        layout["header"].update(Panel(header_text, border_style="red"))
+
+        tbl = Table(show_header=False, box=box.DOUBLE_EDGE, border_style="red")
+        tbl.add_column("Metric", style="yellow", width=15)
+        tbl.add_column("Value", style="bold red")
+
         elapsed = time.time() - stats.start_time
-        eta = str(timedelta(seconds=int(stats.eta_seconds))) if stats.eta_seconds > 0 else "Calculating..."
-        tbl.add_row("🔐 Generated", f"{stats.passwords_generated:,}")
-        tbl.add_row("⚡ Rate", f"{stats.generation_rate:.1f}/sec")
-        tbl.add_row("📝 Current", stats.current_password[:60])
-        tbl.add_row("🎯 Phase", stats.current_phase)
-        tbl.add_row("⏱️ Elapsed", str(timedelta(seconds=int(elapsed))))
+        eta = str(timedelta(seconds=int(stats.eta_seconds))) if stats.eta_seconds > 0 else "COMPUTING..."
+
+        # Add glitch effects to stats
+        def glitch(text, rate=0.1):
+            if random.random() < rate:
+                return "".join(secrets.choice([c, c.lower(), c.upper(), "▓", "░"]) for c in text)
+            return text
+
+        tbl.add_row(glitch("🔐 VECTORS"), f"{stats.passwords_generated:,}")
+        tbl.add_row(glitch("⚡ SPEED"), f"{stats.generation_rate:.1f}/s")
+        tbl.add_row(glitch("📝 PAYLOAD"), stats.current_password[:60])
+        tbl.add_row(glitch("🎯 PHASE"), stats.current_phase)
+        tbl.add_row(glitch("⏱️ DURATION"), str(timedelta(seconds=int(elapsed))))
         tbl.add_row("⏳ ETA", eta)
-        tbl.add_row("💾 Memory", f"{stats.memory_usage_mb:.1f} MB")
-        tbl.add_row("💽 Disk", f"{stats.disk_space_gb:.1f} GB")
+        tbl.add_row(glitch("💾 MEMORY"), f"{stats.memory_usage_mb:.1f} MB")
+        tbl.add_row(glitch("💽 STORAGE"), f"{stats.disk_space_gb:.1f} GB")
         if stats.strong_mode_filtered > 0:
-            tbl.add_row("🛡️ Filtered", f"{stats.strong_mode_filtered:,}")
-        layout["stats"].update(Panel(tbl, title="📊 Live Statistics", border_style="cyan"))
+            tbl.add_row(glitch("🛡️ REJECTED"), f"{stats.strong_mode_filtered:,}")
+        layout["stats"].update(Panel(tbl, title="[bold yellow]ATTACK STATS[/bold yellow]", border_style="yellow"))
 
         if stats.estimated_total > 0:
             pct = min(100.0, (stats.passwords_generated / max(1, stats.estimated_total)) * 100.0)
@@ -252,9 +280,10 @@ class MatrixUI:
             text = f"Progress: {pct:.1f}%\n[{bar}]\n{stats.passwords_generated:,} / {stats.estimated_total:,}\n\n{stats.current_password}"
         else:
             text = f"Generated: {stats.passwords_generated:,}\n\n{stats.current_password}"
-        layout["progress"].update(Panel(text, title="⚡ Live Progress", border_style="yellow"))
+        layout["progress"].update(Panel(text, title="[bold red]LIVE FEED[/bold red]", border_style="red"))
 
-        layout["footer"].update(Panel(f"Press Ctrl+C to stop safely • Output: {stats.output_file}", border_style="blue"))
+        footer_text = f"CTRL+C TO ABORT ATTACK • TARGET: {stats.output_file}"
+        layout["footer"].update(Panel(footer_text, border_style="blue"))
 
 class Bloom:
     """Simple scalable bloom-like set using multiple hashed buckets for lower RAM than Python set.
@@ -288,7 +317,7 @@ class Bloom:
 
 class PassBotEnterprise:
     def __init__(self):
-        self.ui = MatrixUI()
+        self.ui = HorrorUI()
         self.stats = LiveStats()
         self.input_profile: Optional[InputProfile] = None
         self.generated_passwords: Set[str] = set()
@@ -385,6 +414,16 @@ class PassBotEnterprise:
             self.stats.start_time = st.start_time or time.time()
             self.stats.strong_mode_filtered = st.strong_mode_filtered
             self._preload_existing_output()
+
+            # If the state file claims passwords were generated, but after preloading we have none,
+            # then the output file was likely deleted. Force a fresh start.
+            if st.total_generated > 0 and not self.generated_passwords:
+                print(f"{YELLOW}[⚠️] Progress file indicates passwords were generated, but output file is missing or empty. Starting fresh to ensure data integrity.{RESET}")
+                # Reset state variables that might have been partially set
+                self.current_phase = 1
+                self.phase_position = 0
+                return False
+
             print(f"{GREEN}[📂] Resumed with {len(self.generated_passwords):,} entries • Phase {self.current_phase} pos {self.phase_position}{RESET}")
             return True
         except Exception as e:
@@ -452,6 +491,10 @@ class PassBotEnterprise:
             return False
         if pw in self.generated_passwords:
             return False
+        if self.input_profile.min_length > 0 and len(pw) < self.input_profile.min_length:
+            return False
+        if self.input_profile.max_length > 0 and len(pw) > self.input_profile.max_length:
+            return False
         if self.input_profile.generation_mode == "strong" and not PasswordStrength.is_strong(pw, self.input_profile.strong_threshold):
             self.stats.strong_mode_filtered += 1
             return False
@@ -506,7 +549,7 @@ class PassBotEnterprise:
                 patterns.extend(self._num_patterns(p))
         out = Prompt.ask("💾 Output filename", default="passbot_dictionary.txt") if RICH_AVAILABLE else (input("Output filename [passbot_dictionary.txt]: ").strip() or "passbot_dictionary.txt")
         mode = Prompt.ask("💪 Mode", choices=["full","strong"], default="full") if RICH_AVAILABLE else (input("Mode (full/strong) [full]: ").strip().lower() or "full")
-        gzip_out = Confirm.ask("🌀 Compress output with gzip?", default=False) if RICH_AVAILABLE else (input("Compress with gzip? (y/N): ").strip().lower() in ("y","yes","1"))
+        compression = Prompt.ask("🌀 Compression", choices=["none", "gzip", "bzip2", "lzma"], default="none") if RICH_AVAILABLE else (input("Compression (none/gzip/bzip2/lzma) [none]: ").strip().lower() or "none")
         shard = Confirm.ask("📦 Shard output every ~1,000,000 entries?", default=False) if RICH_AVAILABLE else (input("Shard every 1M? (y/N): ").strip().lower() in ("y","yes","1"))
         strong_thr = 60.0
         if mode == "strong":
@@ -527,6 +570,11 @@ class PassBotEnterprise:
                 max_count = 0
             if max_count == 0:
                 max_count = None
+
+        min_len = IntPrompt.ask("Minimum password length (0 = no limit)", default=0) if RICH_AVAILABLE else int(input("Minimum password length (0 = no limit) [0]: ") or "0")
+        max_len = IntPrompt.ask("Maximum password length (0 = no limit)", default=0) if RICH_AVAILABLE else int(input("Maximum password length (0 = no limit) [0]: ") or "0")
+        leetspeak = Confirm.ask("Enable leetspeak transformations (e.g., e -> 3)?", default=False) if RICH_AVAILABLE else (input("Enable leetspeak? (y/N): ").strip().lower() in ("y","yes","1"))
+
         prof = InputProfile(
             words=words,
             mobile_numbers=mobiles,
@@ -538,9 +586,12 @@ class PassBotEnterprise:
             generation_mode=mode,
             use_underscore_separator=allow_us,
             max_output_count=max_count,
-            gzip_output=gzip_out,
+            compression=compression,
             shard_every_million=shard,
             strong_threshold=strong_thr,
+            min_length=min_len,
+            max_length=max_len,
+            leetspeak=leetspeak,
         )
         return prof
 
@@ -575,6 +626,10 @@ class PassBotEnterprise:
         if self.input_profile.max_output_count:
             total = min(total, self.input_profile.max_output_count)
         return max(0, total)
+
+    def _leetspeak(self, s: str) -> str:
+        leet_map = {'e': '3', 'a': '4', 's': '5', 'o': '0', 'i': '1', 't': '7'}
+        return "".join(leet_map.get(c.lower(), c) for c in s)
 
     def _preload_existing_output(self):
         # Dedupe history
@@ -611,13 +666,14 @@ class PassBotEnterprise:
     def _run_generation(self, layout):
         # phase names
         PH = {
-            1: "Phase 1/7: Single Words",
-            2: "Phase 2/7: Single Numbers",
-            3: "Phase 3/7: Word + Number",
-            4: "Phase 4/7: Word + Special",
-            5: "Phase 5/7: Number + Special",
-            6: "Phase 6/7: Word + Word",
-            7: "Phase 7/7: Three Elements",
+            1: "Phase 1/8: Single Words",
+            2: "Phase 2/8: Single Numbers",
+            3: "Phase 3/8: Word + Number",
+            4: "Phase 4/8: Word + Special",
+            5: "Phase 5/8: Number + Special",
+            6: "Phase 6/8: Word + Word",
+            7: "Phase 7/8: Three Elements",
+            8: "Phase 8/8: Leetspeak",
         }
         # Phase 1
         if self.current_phase == 1:
@@ -768,19 +824,44 @@ class PassBotEnterprise:
                                             self._update_stats(c, name); self.ui.update_live(layout, self.stats)
                                         idx += 1; self.phase_position = idx
 
+        # Phase 8: Leetspeak
+        if self.input_profile.leetspeak:
+            name = "Phase 8/8: Leetspeak"
+            passwords_to_transform = list(self.generated_passwords)
+            for i, pw in enumerate(passwords_to_transform):
+                if self.interrupted: return
+                leet_pw = self._leetspeak(pw)
+                if leet_pw != pw:
+                    self._write(leet_pw)
+                if (i % 200) == 0:
+                    self._update_stats(leet_pw, name); self.ui.update_live(layout, self.stats)
+
     def _open_output(self):
         fname = self.input_profile.output_filename
-        if self.input_profile.gzip_output and not fname.endswith('.gz'):
+        if self.input_profile.compression == "gzip" and not fname.endswith('.gz'):
             fname += '.gz'
-            self.input_profile.output_filename = fname
+        elif self.input_profile.compression == "bzip2" and not fname.endswith('.bz2'):
+            fname += '.bz2'
+        elif self.input_profile.compression == "lzma" and not fname.endswith('.xz'):
+            fname += '.xz'
+
+        self.input_profile.output_filename = fname
         os.makedirs(os.path.dirname(fname) or '.', exist_ok=True)
-        self.output_handle = gzip.open(fname, 'ab', compresslevel=6) if fname.endswith('.gz') else open(fname, 'ab', buffering=1024*1024)
+
+        if self.input_profile.compression == "gzip":
+            self.output_handle = gzip.open(fname, 'ab', compresslevel=6)
+        elif self.input_profile.compression == "bzip2":
+            self.output_handle = bz2.open(fname, 'ab')
+        elif self.input_profile.compression == "lzma":
+            self.output_handle = lzma.open(fname, 'ab')
+        else:
+            self.output_handle = open(fname, 'ab', buffering=1024*1024)
 
     def run(self) -> int:
         # Full Brand intro with ASCII art
         self.ui.show_full_banner()
         time.sleep(2.0)  # Let user see the banner
-        
+
         # Resume or fresh
         resumed = False
         if os.path.exists(self.progress_file):
