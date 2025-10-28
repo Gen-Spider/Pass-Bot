@@ -385,6 +385,16 @@ class PassBotEnterprise:
             self.stats.start_time = st.start_time or time.time()
             self.stats.strong_mode_filtered = st.strong_mode_filtered
             self._preload_existing_output()
+
+            # If the state file claims passwords were generated, but after preloading we have none,
+            # then the output file was likely deleted. Force a fresh start.
+            if st.total_generated > 0 and not self.generated_passwords:
+                print(f"{YELLOW}[⚠️] Progress file indicates passwords were generated, but output file is missing or empty. Starting fresh to ensure data integrity.{RESET}")
+                # Reset state variables that might have been partially set
+                self.current_phase = 1
+                self.phase_position = 0
+                return False
+
             print(f"{GREEN}[📂] Resumed with {len(self.generated_passwords):,} entries • Phase {self.current_phase} pos {self.phase_position}{RESET}")
             return True
         except Exception as e:
