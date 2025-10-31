@@ -216,6 +216,7 @@ class MatrixUI:
     def layout(self):
         if not RICH_AVAILABLE:
             return None
+        from rich.layout import Layout  # <-- Fix: Add local import here
         lay = Layout()
         lay.split(Layout(name="header", size=3), Layout(name="main", ratio=1), Layout(name="footer", size=3))
         lay["main"].split_row(Layout(name="stats", ratio=2), Layout(name="progress", ratio=3))
@@ -351,7 +352,7 @@ class PassBotEnterprise:
             cursors = {self.current_phase: (self.phase_position, 0, 0, 0)}
             st = ProgressState(
                 version=STATE_VERSION,
-                phases_done={},
+                phases_done={}, # This field seems unused in the current logic, but we'll preserve it
                 idx_cursors=cursors,
                 total_generated=len(self.generated_passwords),
                 start_time=self.stats.start_time,
@@ -384,8 +385,8 @@ class PassBotEnterprise:
             self.phase_position = st.idx_cursors.get(self.current_phase, (0,0,0,0))[0]
             self.stats.start_time = st.start_time or time.time()
             self.stats.strong_mode_filtered = st.strong_mode_filtered
-            self._preload_existing_output()
-            print(f"{GREEN}[📂] Resumed with {len(self.generated_passwords):,} entries • Phase {self.current_phase} pos {self.phase_position}{RESET}")
+            # Don't preload output here, it will be preloaded after _prepare() and _open_output()
+            print(f"{GREEN}[📂] Resuming state • Phase {self.current_phase} pos {self.phase_position}{RESET}")
             return True
         except Exception as e:
             print(f"{YELLOW}[⚠️] Resume failed: {e}{RESET}")
@@ -549,7 +550,15 @@ class PassBotEnterprise:
         self.words = sorted({v for w in self.input_profile.words for v in self._variants(w)})
         self.numbers = sorted(set(self.input_profile.mobile_numbers + self.input_profile.date_fragments + self.input_profile.year_ranges + self.input_profile.number_patterns))
         self.specials = sorted(set(self.input_profile.special_chars))
-        self.seps = ["_"] if self.input_profile.use_underscore_separator else [""]
+        
+        # *** LOGIC CORRECTION ***
+        # Original logic: self.seps = ["_"] if self.input_profile.use_underscore_separator else [""]
+        # This was incorrect as it *replaced* the no-separator case ("") with the underscore ("_").
+        # Corrected logic: Always include no-separator, and *add* underscore if requested.
+        self.seps = [""]
+        if self.input_profile.use_underscore_separator:
+            self.seps.append("_")
+        # **************************
 
     def _estimate_total(self) -> int:
         W = len(self.words); N = len(self.numbers); S = len(self.specials); SEP = len(self.seps)
@@ -805,7 +814,7 @@ class PassBotEnterprise:
         except Exception as e:
             print(f"{RED}❌ Cannot open output: {e}{RESET}")
             return 1
-        self._preload_existing_output()
+        self._preload_existing_output() # Preload *after* output handle is open
         # Cap already satisfied?
         if self.input_profile.max_output_count and len(self.generated_passwords) >= self.input_profile.max_output_count:
             print(f"{GREEN}✔ Max output already reached ({len(self.generated_passwords):,}). Nothing to do.{RESET}")
@@ -835,7 +844,7 @@ class PassBotEnterprise:
             except Exception:
                 pass
             if not self.interrupted:
-                self._save_progress()
+                self._save_progress() # Save final progress
         # Summary
         total = len(self.generated_passwords)
         elapsed = time.time() - self.stats.start_time
@@ -854,3 +863,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
